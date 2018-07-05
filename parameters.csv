@@ -1,0 +1,84 @@
+par,value
+##
+## NOTE: DO NOT DELETE PARAMETERS IN THIS FILE!!
+##
+## -------------- OPTIONS FOR DATA PREPARATION -------------- ##
+##
+## -- SPECIES NAME -- ##
+resp.name,SpeciesName
+##
+## -- NUMBER OF PSEUDO ABSENCES -- ##
+PA.nb.absences,91
+##
+## -- NUMBER OF PA SETS -- ##
+PA.nb.rep,2
+##
+## -------------- OPTIONS FOR MODEL TRAINING/CALIBRATION -------------- ##
+##
+## -- R VECTOR WITH MODELS TO RUN -- ##
+models,"c('GLM','GBM','GAM','CTA','ANN','SRE','FDA','MARS','RF','MAXENT.Phillips','MAXENT.Tsuruoka')"
+##
+## -- MODEL OPTIONS -- ##
+opts.GLM,NULL
+opts.GBM,NULL
+opts.GAM,NULL
+opts.CTA,NULL
+opts.ANN,NULL
+opts.SRE,NULL
+opts.FDA,NULL
+opts.MARS,NULL
+opts.RF,NULL
+opts.MAXENT.Phillips,NULL
+opts.MAXENT.Tsuruoka,NULL
+##
+## NUMBER EVALUATION RUNS -- ##
+NbRunEval,3
+##
+## -- TRAIN DATA SPLIT (% USED FOR MODEL TRAINING) -- ##
+DataSplit,80
+##
+## -- RESPONSE VECTOR WEIGHTS -- ##
+Yweights,NULL
+##
+## -- SPECIES PREVALENCE -- ##
+Prevalence,0.5
+##
+## -- NUMBER OF ROUNDS USED TO CALCULATE VARIABLE IMPORTANCE -- ##
+VarImport,0
+##
+## -- R VECTOR WITH WITH EVAL METRICS -- ##
+models.eval.meth,"c('TSS','ROC','KAPPA')"
+##
+## -- SAVE OBJECTS TO DISK (HIGHLY RECOMMENDED) -- ##
+SaveObj,TRUE
+##
+## -- RESCALE MODEL PREDICTIONS? -- ##
+rescal.all.models,TRUE
+##
+## -- TRAIN MODEL ON FULL DATASET -- ##
+do.full.models,TRUE
+##
+## -------------- OPTIONS FOR MODEL ENSEMBLING -------------- ##
+##
+chosen.models,all
+em.by,all
+eval.metric,"c('ROC')"
+eval.metric.quality.threshold,"c(0.7)"
+prob.mean,TRUE
+prob.cv,FALSE
+prob.ci,FALSE
+prob.ci.alpha,0.05
+prob.median,FALSE
+committee.averaging,FALSE
+prob.mean.weight,FALSE
+prob.mean.weight.decay,proportional
+##
+## -------------- OPTIONS FOR MODEL PROJECTION -------------- ##
+##
+proj.name,current
+proj.binary.meth,"c('TSS')"
+##
+## -------------- OPTIONS FOR ENSEMBLE FORECASTING -------------- ##
+##
+ef.binary.meth,"c('ROC', 'TSS')"
+filtered.meth,"c('ROC', 'TSS')"
