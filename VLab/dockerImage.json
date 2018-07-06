@@ -1,0 +1,14 @@
+{
+
+  "image": "jfgoncalves/r-biomod2",
+  "resources": {
+    "memory_mb": "5000",
+    "cpu_units": ""
+ },
+  "container": {
+    "entryPoint": [
+      "/bin/bash",
+      "-c"
+ ]
+  }
+}

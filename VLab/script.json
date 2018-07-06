@@ -1,0 +1,9 @@
+{
+  "scripts": [
+    {
+      "repoPath": "/usr/local/src",
+      "targetPath": "/usr/local/src/Rscript --vanilla run_biomod2.r vars.zip input_records.csv parameters.csv",
+      "pathType": "FILE"
+ }
+  ]
+}

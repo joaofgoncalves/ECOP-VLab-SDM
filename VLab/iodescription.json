@@ -1,0 +1,48 @@
+{
+  "inputs": [
+    {
+      "id": "R_biomod2_input_vars",
+      "inputType": "individual",
+      "valueType": "value",
+      "description": "URL to download the input zip file containing raster covariates",
+      "name": "Input raster covariates (zip file)",
+      "obligation": false,
+      "hasDefault": true,
+      "valueSchema": "url",
+      "target": "/usr/local/src/vars.zip"
+ },
+ {
+  "id": "R_biomod2_input_species_records",
+  "inputType": "individual",
+  "valueType": "value",
+  "description": "URL to download the input species records",
+  "name": "Input species records (csv file)",
+  "obligation": false,
+  "hasDefault": true,
+  "valueSchema": "url",
+  "target": "/usr/local/src/input_records.csv"
+},
+{
+  "id": "R_biomod2_",
+  "inputType": "individual",
+  "valueType": "value",
+  "description": "URL to download the csv file containing the R-biomod2 parameters",
+  "name": "R-biomod2 parameters (csv file)",
+  "obligation": false,
+  "hasDefault": true,
+  "valueSchema": "url",
+  "target": "/usr/local/src/parameters.csv"
+}
+  ],
+  "outputs": [
+    {
+      "id": "R_biomod2_output",
+      "outputType": "individual",
+      "valueType": "value",
+      "description": "R-biomod2 output file",
+      "name": "Output archive (zip file)",
+      "valueSchema": "url",
+      "target": "/usr/local/src/output.zip"
+ }
+  ]
+}
