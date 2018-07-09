@@ -1,9 +1,19 @@
 {
   "scripts": [
     {
-      "repoPath": "/usr/local/src",
-      "targetPath": "/usr/local/src/Rscript --vanilla run_biomod2.r vars.zip input_records.csv parameters.csv",
+      "repoPath": "scripts/run_biomod2.r",
+      "targetPath": "run_biomod2.r",
       "pathType": "FILE"
- }
+    },
+    {
+      "repoPath": "scripts/run_biomod2.sh",
+      "targetPath": "run_biomod2.sh",
+      "pathType": "FILE"
+    },
+    {
+      "repoPath": "scripts/maxent.jar",
+      "targetPath": "output/maxent.jar",
+      "pathType": "FILE"
+    }
   ]
 }

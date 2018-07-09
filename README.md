@@ -9,7 +9,7 @@ Porto, 2018
 
 ## Description
 
-This repository contains a generalized version of the SDM correlative model developed 
+This repository contains a generic version of the SDM correlative model developed 
 using R/biomod2 and aiming to predict the current distribution of Iris boissieri 
 based on satellite-derived Ecosystem Functional Attributes presented in:
 

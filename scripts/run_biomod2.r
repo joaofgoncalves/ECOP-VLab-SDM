@@ -1,21 +1,11 @@
 
 ### ------------------------------------------------------------------------------ ###
 ### 
-### ECOPOTENTIAL VirtualLab r-biomod2 model porting
+### ECOPOTENTIAL VirtualLab R-biomod2 model
 ### ICETA / CIBIO / InBIO team
 ###
 ### Salvador Arenas-Castro, Joao Goncalves
 ### Porto, 2018
-###
-### This script contains a generalized version of the SDM correlative model developed 
-### using R/biomod2 and aiming to predict the current distribution of Iris boissieri 
-### based on satellite-derived Ecosystem Functional Attributes presented in:
-###
-### Arenas-Castro, S. et (2018). Assessing the multi-scale predictive ability of 
-### ecosystem functional attributes for species distribution modelling. PLoS One.
-### 
-### http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0199292
-### https://doi.org/10.1371/journal.pone.0199292
 ###
 ### ------------------------------------------------------------------------------ ###
 
@@ -23,21 +13,27 @@
 library(raster)
 library(biomod2)
 
-# Set working directory
-setwd("/usr/local/src")
-
 # Get arguments from the command line
 # [1] a zip file containing the raster covariates
 # [2] a csv file containing two columns [X, Y] with presence record coordinates
 # [3] a csv files with parameters
 
+# Log output messages to file
+sink("log.txt")
+
 # Get command line values
 args <- commandArgs(trailingOnly=TRUE)
 
-if (length(args)==0) {
+if(length(args)==0) {
   stop("At least one argument must be supplied!", call.=FALSE)
 }
 
+if(!file.exists(args[1]))
+  stop("Input raster covariates zip file not found!")
+if(!file.exists(args[2]))
+  stop("Input species records csv file not found!")
+if(!file.exists(args[3]))
+  stop("Input parameters csv file not found!")
 
 ### ------------------------------------------------------------------------------ ###
 ### 1 | LOAD PARAMETERS AND DATA FROM FILES                                        ###
@@ -54,9 +50,15 @@ if(ncol(pars) != 2)
 rownames(pars) <- pars[,1]
 print(pars)
 
+
+# ---- Parameters for BIOMOD_FormatingData
+#
 resp.name <- as.character(pars["resp.name",2])
 PA.nb.absences <- as.integer(pars["PA.nb.absences",2])
 PA.nb.rep  <- as.integer(pars["PA.nb.rep",2])
+
+# ---- Parameters for BIOMOD_ModelingOptions
+#
 models <- eval(parse(text=as.character(pars["models",2])))
 NbRunEval <- as.integer(pars["NbRunEval",2])
 DataSplit <- as.integer(pars["DataSplit",2])
@@ -68,10 +70,17 @@ SaveObj <- as.logical(as.character(pars["SaveObj",2]))
 rescal.all.models <- as.logical(as.character(pars["rescal.all.models",2]))
 do.full.models <- as.logical(as.character(pars["do.full.models",2]))
 
-print(resp.name)
-print(PA.nb.rep)
-print(PA.nb.absences)
-print(models.eval.meth)
+# ---- Parameters for BIOMOD_Modeling
+#
+
+# ---- Parameters for BIOMOD_EnsembleModeling
+#
+
+# ---- Parameters for BIOMOD_Projection
+#
+
+# ---- Parameters for BIOMOD_EnsembleForecasting
+#
 
 # Unzip the covariates data
 unzip(zipfile = args[1], overwrite = TRUE)
@@ -79,13 +88,20 @@ unzip(zipfile = args[1], overwrite = TRUE)
 # List all GeoTIFF files to be used for 
 fl <- list.files(pattern=".tif$", full.names = TRUE)
 
+print(fl)
+
+if(is.null(fl) | length(fl)==0)
+  stop("Not input GeoTIFF files were provided in vars.zip!")
+
 # Environmental predictors
 myExpl <- stack(fl)
 print(myExpl)
 
 # Load species data
 DataSpecies <- read.csv(args[2], sep=',')
+
 # Check species data
+cat("Found",nrow(DataSpecies),"records for the target species!\n\n")
 head(DataSpecies)
 
 # Create spatial points object / Presence/absence data for the target species
@@ -94,11 +110,22 @@ myResp <- SpatialPoints(DataSpecies[,c("X","Y")], proj4string = crs(myExpl))
 print(myResp)
 
 
+
 ### ------------------------------------------------------------------------------ ###
 ### 2 | BIOMOD DATA FORMATING/PREPARATION                                          ###
 ### ------------------------------------------------------------------------------ ###
 
-myBiomodData <- BIOMOD_FormatingData(resp.var = myResp,
+print(getwd())
+
+# Set working directory for biomod2 analyses
+if(dir.exists("./output")){
+  setwd("./output")
+}else{
+  stop("Output directory does not exists")
+}
+
+
+myBiomodData <- try(BIOMOD_FormatingData(resp.var = myResp,
                                      expl.var = myExpl,
                                      resp.name = resp.name,
                                      eval.resp.var = NULL,
@@ -111,7 +138,10 @@ myBiomodData <- BIOMOD_FormatingData(resp.var = myResp,
                                      PA.dist.max = NULL,
                                      PA.sre.quant = 0.025,
                                      PA.table = NULL,
-                                     na.rm = TRUE)
+                                     na.rm = TRUE))
+
+if(inherits(myBiomodData,"try-error"))
+  stop("\nFailed to perform BIOMOD_FormatingData step!\n")
 
 # Check biomod formatted data
 print(myBiomodData)
@@ -121,7 +151,8 @@ print(myBiomodData)
 ### 3 | DEFINE MODEL OPTIONS                                                       ###
 ### ------------------------------------------------------------------------------ ###
 
-opts <- BIOMOD_ModelingOptions(
+#myBiomodOption <- BIOMOD_ModelingOptions(GAM = list(k = 4))
+myBiomodOptions <- try(BIOMOD_ModelingOptions(
   GLM = eval(parse(text=as.character(pars["opts.GLM",2]))),
   GBM = eval(parse(text=as.character(pars["opts.GBM",2]))),
   GAM = eval(parse(text=as.character(pars["opts.GAM",2]))),
@@ -133,11 +164,12 @@ opts <- BIOMOD_ModelingOptions(
   RF = eval(parse(text=as.character(pars["opts.RF",2]))),
   MAXENT.Phillips = eval(parse(text=as.character(pars["opts.MAXENT.Phillips",2]))),
   MAXENT.Tsuruoka = eval(parse(text=as.character(pars["opts.MAXENT.Tsuruoka",2])))
-)
+))
 
-print(opts)
+if(inherits(myBiomodOptions,"try-error"))
+  stop("\nFailed to perform BIOMOD_ModelingOptions step!\n")
 
-myBiomodOption <- BIOMOD_ModelingOptions(GAM = list(k = 4))
+print(myBiomodOptions)
 
 
 ### ------------------------------------------------------------------------------ ###
@@ -159,6 +191,9 @@ myBiomodModelOut <- BIOMOD_Modeling(
   do.full.models = TRUE)     # models calibrated and evaluated with whole dataset
   # modeling.id = "allmodels") # ID (=NAME) of modelling procedure
 
+if(inherits(myBiomodModelOut,"try-error"))
+  stop("\nFailed to perform BIOMOD_Modeling step!\n")
+
 # MODELING SUMMARY
 print(myBiomodModelOut)
 print(list.files(paste("./",resp.name,sep="")))
@@ -168,7 +203,7 @@ print(list.files(paste("./",resp.name,sep="")))
 ### 5 | MODEL EVALUATION STATS                                                     ###
 ### ------------------------------------------------------------------------------ ###
 
-# GET ALL MODEL EVALUATIONs
+# GET ALL MODEL EVALUATIONS
 modEvalStats <- as.data.frame(get_evaluations(myBiomodModelOut))
 write.csv(modEvalStats, paste("./",resp.name,"/modEvalStats.csv",sep=""))
 
@@ -181,7 +216,7 @@ write.csv(varImpObj, paste("./",resp.name,"/variableImportances.csv",sep=""))
 ### 6 | ENSEMBLE MODELING                                                          ###
 ### ------------------------------------------------------------------------------ ###
 
-myBiomodEM <- BIOMOD_EnsembleModeling( 
+myBiomodEM <- try(BIOMOD_EnsembleModeling( 
   modeling.output = myBiomodModelOut, # model results
   chosen.models = 'all', # models to be included when ensembling
   em.by='all', # flag defining the way the models will be combined to build the ensemble models: 'PA_dataset+repet' (default), 'PA_dataset+algo', 'PA_dataset', 'algo', 'all'
@@ -194,7 +229,11 @@ myBiomodEM <- BIOMOD_EnsembleModeling(
   prob.median = FALSE, # estimate the mediane of probabilities
   committee.averaging = FALSE, # estimate the committee averaging across predictions
   prob.mean.weight = FALSE, # estimate the weighted sum of probabilities
-  prob.mean.weight.decay = 'proportional') # define the relative importance of the weights
+  prob.mean.weight.decay = 'proportional')) # define the relative importance of the weights
+
+
+if(inherits(myBiomodEM,"try-error"))
+  stop("\nFailed to perform BIOMOD_EnsembleModeling step!\n")
 
 #PRINT SUMMARY                     
 print(myBiomodEM)
@@ -204,8 +243,7 @@ print(myBiomodEM)
 ### 7 | PROJECTION OF MODELS TO THE FULL GEO/ENV SPACE USING THE TRAINING RASTER DATA  ###
 ### ---------------------------------------------------------------------------------- ###
 
-#PROJECTION OVER THE STUDY AREA UNDER CURRENT CONDITIONS
-myBiomodProj <- BIOMOD_Projection(
+myBiomodProj <- try(BIOMOD_Projection(
   modeling.output = myBiomodModelOut, # modelling results
   new.env = myExpl, # environmental variables
   proj.name = 'current', # name of projections
@@ -213,8 +251,12 @@ myBiomodProj <- BIOMOD_Projection(
   binary.meth = 'TSS', # a vector of a subset of models evaluation method computed before
   build.clamping.mask = TRUE, # if TRUE, a clamping mask will be saved on hard drive different
   output.format = '.grd', # the format of the GIS files
-  do.stack = TRUE)
+  do.stack = TRUE))
 
+if(inherits(myBiomodProj,"try-error"))
+  stop("\nFailed to perform BIOMOD_Projection step!\n")
+
+print(myBiomodProj)
 mod_projPres <- get_predictions(myBiomodProj)
 writeRaster(mod_projPres, filename = paste("./",resp.name,"/modelProjectionsByModel.tif",sep=""), overwrite = TRUE)
 
@@ -223,14 +265,19 @@ writeRaster(mod_projPres, filename = paste("./",resp.name,"/modelProjectionsByMo
 ### 8 | ENSEMBLE FORECASTING                                                           ###
 ### ---------------------------------------------------------------------------------- ###
 
-myBiomodEF <- BIOMOD_EnsembleForecasting( 
+myBiomodEF <- try(BIOMOD_EnsembleForecasting( 
   EM.output = myBiomodEM,
   projection.output = myBiomodProj,
   binary.meth = c('ROC', 'TSS'),
   filtered.meth = c('ROC', 'TSS'),
   compress = TRUE,
-  output.format = '.grd')
+  output.format = '.grd'))
 
+
+if(inherits(myBiomodEF,"try-error"))
+  stop("\nFailed to perform BIOMOD_EnsembleForecasting step!\n")
+
+print(myBiomodEF)
 mod_projBiomodEF <- get_predictions(myBiomodEF)
 writeRaster(mod_projBiomodEF, filename = paste("./",resp.name,"/modelProjEnsembleForecasting.tif",sep=""), overwrite = TRUE)
 
@@ -238,4 +285,5 @@ writeRaster(mod_projBiomodEF, filename = paste("./",resp.name,"/modelProjEnsembl
 ## This file should be exported from VLab
 zip("output.zip", paste("./", resp.name, sep=""))
 
-
+# Close log.txt file
+sink()

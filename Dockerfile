@@ -3,21 +3,24 @@ FROM jfgoncalves/r-biomod2:latest
 MAINTAINER "Joao F Goncalves" "joaofgo@gmail.com"
 
 ## Copy biomod2 script
-COPY run_biomod2.r /usr/local/src
+COPY ./scripts/run_biomod2.r /
+COPY ./scripts/run_biomod2.sh /
+
+RUN mkdir -p ./input
+RUN mkdir -p ./output
 
 ## Input covariates data 
-COPY vars.zip /usr/local/src
+COPY ./input/vars.zip ./input
 
 ## Input PA records for the target species
-COPY input_records.csv /usr/local/src
+COPY ./input/input_records.csv ./input
 
 ## Parameters for running biomod
-COPY parameters.csv /usr/local/src
+COPY ./input/parameters.csv ./input
 
 ## Maxent java files
-COPY maxent.jar /usr/local/src
-COPY maxent.sh /usr/local/src
+COPY ./scripts/maxent.jar ./output
 
-## Run R script
-WORKDIR /usr/local/src
-CMD ["Rscript", "--vanilla run_biomod2.r vars.zip input_records.csv parameters.csv"]
+## Run R script -- don't use this
+WORKDIR ./output
+#CMD ["Rscript", "--vanilla ../run_biomod2.r ../input/vars.zip ../input/input_records.csv ../input/parameters.csv"]
