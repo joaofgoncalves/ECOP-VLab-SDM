@@ -59,3 +59,7 @@ R (mainly including the raster and biomod2 packages, along with their dependenci
 ### IPR
 
 CC-BY-NC 2.0.
+
+### ECOPOTENTIAL Partner
+
+ICETA / CIBIO / InBIO - Instituto de Ciências, Tecnologias e Agroambiente, University of Porto, Portugal [link-1](https://cibio.up.pt/) [link-2](http://inbio-la.pt/) [link-3](http://www.iceta.up.pt/)
