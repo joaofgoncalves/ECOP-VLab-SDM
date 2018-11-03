@@ -1,18 +1,18 @@
 {
   "scripts": [
     {
-      "repoPath": "scripts/run_biomod2.r",
+      "repoPath": "run.sh",
+      "targetPath": "run.sh",
+      "pathType": "FILE"
+    },
+    {
+      "repoPath": "run_biomod2.r",
       "targetPath": "run_biomod2.r",
       "pathType": "FILE"
     },
     {
-      "repoPath": "scripts/run_biomod2.sh",
-      "targetPath": "run_biomod2.sh",
-      "pathType": "FILE"
-    },
-    {
-      "repoPath": "scripts/maxent.jar",
-      "targetPath": "output/maxent.jar",
+      "repoPath": "maxent.jar",
+      "targetPath": "maxent.jar",
       "pathType": "FILE"
     }
   ]
