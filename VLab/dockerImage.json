@@ -11,7 +11,7 @@
       "-c"
  ],
  "command": [
-   "./run_biomod2.sh"
+   "./run.sh"
 ]
   }
 }

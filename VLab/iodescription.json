@@ -9,7 +9,7 @@
       "obligation": true,
       "hasDefault": false,
       "valueSchema": "url",
-      "target": "input/vars.zip"
+      "target": "vars.zip"
     },
     {
       "id": "R_biomod2_input_records",
@@ -20,7 +20,7 @@
       "obligation": true,
       "hasDefault": false,
       "valueSchema": "url",
-      "target": "input/input_records.csv"
+      "target": "input_records.csv"
     },
     {
       "id": "R_biomod2_input_parameters",
@@ -31,7 +31,7 @@
       "obligation": true,
       "hasDefault": false,
       "valueSchema": "url",
-      "target": "input/parameters.csv"
+      "target": "parameters.csv"
     }
   ],
   "outputs": [

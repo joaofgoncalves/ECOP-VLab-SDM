@@ -11,8 +11,8 @@
       "pathType": "FILE"
     },
     {
-      "repoPath": "maxent.jar",
-      "targetPath": "maxent.jar",
+      "repoPath": "./output/maxent.jar",
+      "targetPath": "./output/maxent.jar",
       "pathType": "FILE"
     }
   ]
