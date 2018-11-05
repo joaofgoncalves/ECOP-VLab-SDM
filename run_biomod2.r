@@ -21,6 +21,11 @@ library(biomod2)
 # Log output messages to file
 sink("log.txt")
 
+# Expose the working diretory in the VL container
+print(getwd())
+print(list.files(full.names=TRUE, recursive=TRUE))
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
+
 # Get command line values
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -49,6 +54,7 @@ if(ncol(pars) != 2)
 
 rownames(pars) <- pars[,1]
 print(pars)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 
 # ---- Parameters for BIOMOD_FormatingData
@@ -62,7 +68,7 @@ PA.nb.rep  <- as.integer(pars["PA.nb.rep",2])
 models <- eval(parse(text=as.character(pars["models",2])))
 NbRunEval <- as.integer(pars["NbRunEval",2])
 DataSplit <- as.integer(pars["DataSplit",2])
-Yweights <- as.character(pars["Yweights",2])
+Yweights <- eval(parse(text=as.character(pars["Yweights",2])))
 Prevalence <- as.numeric(pars["Prevalence",2])
 VarImport <- as.integer(pars["VarImport",2])
 models.eval.meth <- eval(parse(text=as.character(pars["models.eval.meth",2])))
@@ -89,6 +95,7 @@ unzip(zipfile = args[1], overwrite = TRUE)
 fl <- list.files(pattern=".tif$", full.names = TRUE)
 
 print(fl)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 if(is.null(fl) | length(fl)==0)
   stop("Not input GeoTIFF files were provided in vars.zip!")
@@ -96,18 +103,21 @@ if(is.null(fl) | length(fl)==0)
 # Environmental predictors
 myExpl <- stack(fl)
 print(myExpl)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 # Load species data
 DataSpecies <- read.csv(args[2], sep=',')
 
 # Check species data
 cat("Found",nrow(DataSpecies),"records for the target species!\n\n")
-head(DataSpecies)
+print(head(DataSpecies))
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 # Create spatial points object / Presence/absence data for the target species
 # Set CRS as the same for myExpl raster stack
 myResp <- SpatialPoints(DataSpecies[,c("X","Y")], proj4string = crs(myExpl))
 print(myResp)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 
 
@@ -115,7 +125,7 @@ print(myResp)
 ### 2 | BIOMOD DATA FORMATING/PREPARATION                                          ###
 ### ------------------------------------------------------------------------------ ###
 
-print(getwd())
+##print(getwd())
 
 # Set working directory for biomod2 analyses
 if(dir.exists("./output")){
@@ -145,6 +155,7 @@ if(inherits(myBiomodData,"try-error"))
 
 # Check biomod formatted data
 print(myBiomodData)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 
 ### ------------------------------------------------------------------------------ ###
@@ -170,6 +181,7 @@ if(inherits(myBiomodOptions,"try-error"))
   stop("\nFailed to perform BIOMOD_ModelingOptions step!\n")
 
 print(myBiomodOptions)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 
 ### ------------------------------------------------------------------------------ ###
@@ -178,17 +190,17 @@ print(myBiomodOptions)
 
 myBiomodModelOut <- BIOMOD_Modeling( 
   myBiomodData, # data including species records, species name, and variables
-  models = c('GLM','GAM'), # models to run
-  models.options = myBiomodOption, # options for modelling
-  NbRunEval = 3, # 30,# number of evaluations runs
-  DataSplit = 80, # % of data used as training
-  Yweights = NULL,
-  Prevalence = 0.5,
-  VarImport = 10, #number of permutation to estimate variable importance
-  models.eval.meth = c('TSS','ROC','KAPPA'), #evaluation metrics
-  SaveObj = TRUE,            # keep all results and outputs on hard drive
-  rescal.all.models = TRUE,  # all models scaled with a binomial GLM
-  do.full.models = TRUE)     # models calibrated and evaluated with whole dataset
+  models = models, # models to run
+  models.options = myBiomodOptions, # options for modelling
+  NbRunEval = NbRunEval, # 30,# number of evaluations runs
+  DataSplit = DataSplit, # % of data used as training
+  Yweights = Yweights,
+  Prevalence = Prevalence,
+  VarImport = VarImport, #number of permutation to estimate variable importance
+  models.eval.meth = models.eval.meth, #evaluation metrics
+  SaveObj = SaveObj,            # keep all results and outputs on hard drive
+  rescal.all.models = rescal.all.models,  # all models scaled with a binomial GLM
+  do.full.models = do.full.models)     # models calibrated and evaluated with whole dataset
   # modeling.id = "allmodels") # ID (=NAME) of modelling procedure
 
 if(inherits(myBiomodModelOut,"try-error"))
@@ -197,6 +209,7 @@ if(inherits(myBiomodModelOut,"try-error"))
 # MODELING SUMMARY
 print(myBiomodModelOut)
 print(list.files(paste("./",resp.name,sep="")))
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 
 ### ------------------------------------------------------------------------------ ###
@@ -237,6 +250,7 @@ if(inherits(myBiomodEM,"try-error"))
 
 #PRINT SUMMARY                     
 print(myBiomodEM)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
 
 
 ### ---------------------------------------------------------------------------------- ###
@@ -248,7 +262,7 @@ myBiomodProj <- try(BIOMOD_Projection(
   new.env = myExpl, # environmental variables
   proj.name = 'current', # name of projections
   selected.models = get_kept_models(myBiomodEM, model = 1), ## Changed this to include only selected models from BIOMOD_EnsembleModeling criteria
-  binary.meth = 'TSS', # a vector of a subset of models evaluation method computed before
+  binary.meth = models.eval.meth, # a vector of a subset of models evaluation method computed before
   build.clamping.mask = TRUE, # if TRUE, a clamping mask will be saved on hard drive different
   output.format = '.grd', # the format of the GIS files
   do.stack = TRUE))
@@ -257,8 +271,11 @@ if(inherits(myBiomodProj,"try-error"))
   stop("\nFailed to perform BIOMOD_Projection step!\n")
 
 print(myBiomodProj)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
+
+# Write output raster files with biomod projections
 mod_projPres <- get_predictions(myBiomodProj)
-writeRaster(mod_projPres, filename = paste("./",resp.name,"/modelProjectionsByModel.tif",sep=""), overwrite = TRUE)
+writeRaster(mod_projPres, filename = paste("./",resp.name,"/biomodProjectionsByModel.tif",sep=""), overwrite = TRUE)
 
 
 ### ---------------------------------------------------------------------------------- ###
@@ -278,6 +295,9 @@ if(inherits(myBiomodEF,"try-error"))
   stop("\nFailed to perform BIOMOD_EnsembleForecasting step!\n")
 
 print(myBiomodEF)
+cat("\n\n## ------------------------------------------------------------------ ##\n\n")
+
+# Write output raster files with biomod projections
 mod_projBiomodEF <- get_predictions(myBiomodEF)
 writeRaster(mod_projBiomodEF, filename = paste("./",resp.name,"/modelProjEnsembleForecasting.tif",sep=""), overwrite = TRUE)
 

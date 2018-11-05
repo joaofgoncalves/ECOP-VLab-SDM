@@ -1,11 +1,11 @@
 par,value
 ##
-## NOTE: DO NOT DELETE PARAMETERS IN THIS FILE!!
+## NOTE: DO NOT DELETE PARAMETERS IN THIS FILE OR CHANGE ITS STRUCTURE!!
 ##
 ## -------------- OPTIONS FOR DATA PREPARATION -------------- ##
 ##
 ## -- SPECIES NAME -- ##
-resp.name,SpeciesName
+resp.name,IrisBoissieri
 ##
 ## -- NUMBER OF PSEUDO ABSENCES -- ##
 PA.nb.absences,91
@@ -16,7 +16,10 @@ PA.nb.rep,2
 ## -------------- OPTIONS FOR MODEL TRAINING/CALIBRATION -------------- ##
 ##
 ## -- R VECTOR WITH MODELS TO RUN -- ##
-models,"c('GLM','GBM','GAM','CTA','ANN','SRE','FDA','MARS','RF','MAXENT.Phillips','MAXENT.Tsuruoka')"
+## Full list is:
+## models,"c('GLM','GBM','GAM','CTA','ANN','SRE','FDA','MARS','RF','MAXENT.Phillips','MAXENT.Tsuruoka')"
+##
+models,"c('GLM','RF','MAXENT.Phillips')"
 ##
 ## -- MODEL OPTIONS -- ##
 opts.GLM,NULL
@@ -44,7 +47,7 @@ Yweights,NULL
 Prevalence,0.5
 ##
 ## -- NUMBER OF ROUNDS USED TO CALCULATE VARIABLE IMPORTANCE -- ##
-VarImport,0
+VarImport,5
 ##
 ## -- R VECTOR WITH WITH EVAL METRICS -- ##
 models.eval.meth,"c('TSS','ROC','KAPPA')"
@@ -53,7 +56,7 @@ models.eval.meth,"c('TSS','ROC','KAPPA')"
 SaveObj,TRUE
 ##
 ## -- RESCALE MODEL PREDICTIONS? -- ##
-rescal.all.models,TRUE
+rescal.all.models,FALSE
 ##
 ## -- TRAIN MODEL ON FULL DATASET -- ##
 do.full.models,TRUE
