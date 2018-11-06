@@ -1,8 +1,10 @@
 par,value
 ##
-## NOTE: DO NOT DELETE PARAMETERS IN THIS FILE OR CHANGE ITS STRUCTURE!!
+## NOTE 1: DO NOT DELETE PARAMETERS IN THIS FILE OR CHANGE ITS STRUCTURE!!
+## NOTE 2: DO NOT USE EXTRA WHITESPACES AFTER THE COMMA OR AFTER THE VALUES
 ##
-## -------------- OPTIONS FOR DATA PREPARATION -------------- ##
+## ____________________________________________________________________ ##
+## ------------------- OPTIONS FOR DATA PREPARATION ------------------- ##
 ##
 ## -- SPECIES NAME -- ##
 resp.name,IrisBoissieri
@@ -13,15 +15,10 @@ PA.nb.absences,91
 ## -- NUMBER OF PA SETS -- ##
 PA.nb.rep,2
 ##
-## -------------- OPTIONS FOR MODEL TRAINING/CALIBRATION -------------- ##
 ##
-## -- R VECTOR WITH MODELS TO RUN -- ##
-## Full list is:
-## models,"c('GLM','GBM','GAM','CTA','ANN','SRE','FDA','MARS','RF','MAXENT.Phillips','MAXENT.Tsuruoka')"
+## ____________________________________________________________________ ##
+## ------------------ MODEL OPTIONS/ HYPER-PARAMETERS ----------------- ##
 ##
-models,"c('GLM','RF','MAXENT.Phillips')"
-##
-## -- MODEL OPTIONS -- ##
 opts.GLM,NULL
 opts.GBM,NULL
 opts.GAM,NULL
@@ -33,6 +30,15 @@ opts.MARS,NULL
 opts.RF,NULL
 opts.MAXENT.Phillips,NULL
 opts.MAXENT.Tsuruoka,NULL
+##
+## ____________________________________________________________________ ##
+## -------------- OPTIONS FOR MODEL TRAINING/CALIBRATION -------------- ##
+##
+## -- R VECTOR WITH MODELS TO RUN -- ##
+## Full list is:
+## models,"c('GLM','GBM','GAM','CTA','ANN','SRE','FDA','MARS','RF','MAXENT.Phillips','MAXENT.Tsuruoka')"
+##
+models,"c('GLM','RF')"
 ##
 ## NUMBER EVALUATION RUNS -- ##
 NbRunEval,3
@@ -50,7 +56,7 @@ Prevalence,0.5
 VarImport,5
 ##
 ## -- R VECTOR WITH WITH EVAL METRICS -- ##
-models.eval.meth,"c('TSS','ROC','KAPPA')"
+models.eval.meth,"c('ROC','TSS','KAPPA')"
 ##
 ## -- SAVE OBJECTS TO DISK (HIGHLY RECOMMENDED) -- ##
 SaveObj,TRUE
@@ -61,27 +67,63 @@ rescal.all.models,FALSE
 ## -- TRAIN MODEL ON FULL DATASET -- ##
 do.full.models,TRUE
 ##
-## -------------- OPTIONS FOR MODEL ENSEMBLING -------------- ##
 ##
-chosen.models,all
-em.by,all
+## ____________________________________________________________________ ##
+## ------------------ OPTIONS FOR MODEL ENSEMBLING -------------------- ##
+##
+## -- CHAR VECTOR WITH SELECTED MODELS-- ##
+chosen.models,"c('all')"
+##
+## -- CHAR VECTOR WITH OPTIONS TO COMBINE THE MODELS -- ##
+em.by,"c('all')"
+##
+## -- CHARACTER VECTOR WITH EVAL METRICS TO USE FOR MODEL SELECTION -- ##
 eval.metric,"c('ROC')"
+##
+## -- CHARACTER VECTOR WITH EVAL METRICS TO USE FOR MODEL SELECTION -- ##
 eval.metric.quality.threshold,"c(0.7)"
+##
+## -- CALCULATE MEAN OF MODEL PROBS? -- ##
 prob.mean,TRUE
+##
+## -- CALCULATE COEF OF VARIATION OF MODEL PROBS? -- ##
 prob.cv,FALSE
+##
+## -- CALCULATE CI OF THE MEAN -- ##
 prob.ci,FALSE
+##
+## -- SIGNIFICANCE INTERVAL FOR CI -- ##
 prob.ci.alpha,0.05
+##
+## -- CALCULATE MEDIAN OF MODEL PROBS? -- ##
 prob.median,FALSE
+##
+## -- CALCULATE COMITTEE AVERAGING OF MODEL PROBS? -- ##
 committee.averaging,FALSE
+##
+## -- CALCULATE WEIGHTED MEAN OF MODEL PROBS? -- ##
 prob.mean.weight,FALSE
-prob.mean.weight.decay,proportional
 ##
-## -------------- OPTIONS FOR MODEL PROJECTION -------------- ##
+## -- RELATIVE IMPORTANCE OF THE WEIGHTS -- ##
+prob.mean.weight.decay,"proportional"
 ##
-proj.name,current
-proj.binary.meth,"c('TSS')"
 ##
-## -------------- OPTIONS FOR ENSEMBLE FORECASTING -------------- ##
+## ____________________________________________________________________ ##
+## ------------------- OPTIONS FOR MODEL PROJECTION ------------------- ##
 ##
-ef.binary.meth,"c('ROC', 'TSS')"
-filtered.meth,"c('ROC', 'TSS')"
+## -- CHAR VECTOR WITH PROJECTION NAME(S) - OUTPUT FOLDER NAME -- ##
+proj.name,"c('current')"
+##
+## -- CHAR VECTOR WITH EVAL METHODS USED TO BINARIZE PROJECTIONS -- ##
+proj.binary.meth,NULL
+##
+##
+## ____________________________________________________________________ ##
+## ---------------- OPTIONS FOR ENSEMBLE FORECASTING ------------------ ##
+##
+## -- CHAR VECTOR WITH EVAL METHODS USED TO BINARIZE PROJECTIONS -- ##
+ef.binary.meth,"c('ROC')"
+##
+## -- CHAR VECTOR WITH EVAL METHODS USED TO BINARIZE PROJECTIONS -- ##
+filtered.meth,"c('ROC')"
+##
