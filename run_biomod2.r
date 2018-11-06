@@ -30,7 +30,7 @@ cat("\n\n## ------------------------------------------------------------------ #
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0) {
-  stop("At least one argument must be supplied!", call.=FALSE)
+  stop("At least one argument must be provided!", call.=FALSE)
 }
 
 if(!file.exists(args[1]))
@@ -63,7 +63,8 @@ resp.name <- as.character(pars["resp.name",2])
 PA.nb.absences <- as.integer(pars["PA.nb.absences",2])
 PA.nb.rep  <- as.integer(pars["PA.nb.rep",2])
 
-# ---- Parameters for BIOMOD_ModelingOptions
+
+# ---- Parameters for BIOMOD_Modeling
 #
 models <- eval(parse(text=as.character(pars["models",2])))
 NbRunEval <- as.integer(pars["NbRunEval",2])
@@ -76,20 +77,37 @@ SaveObj <- as.logical(as.character(pars["SaveObj",2]))
 rescal.all.models <- as.logical(as.character(pars["rescal.all.models",2]))
 do.full.models <- as.logical(as.character(pars["do.full.models",2]))
 
-# ---- Parameters for BIOMOD_Modeling
-#
 
 # ---- Parameters for BIOMOD_EnsembleModeling
 #
+chosen.models <- eval(parse(text=as.character(pars["chosen.models",2])))
+em.by <- eval(parse(text=as.character(pars["em.by",2])))
+eval.metric <- eval(parse(text=as.character(pars["eval.metric",2])))
+eval.metric.quality.threshold <- eval(parse(text=as.character(pars["eval.metric.quality.threshold",2])))
+prob.mean <- as.logical(as.character(pars["prob.mean",2]))
+prob.cv <- as.logical(as.character(pars["prob.cv",2]))
+prob.ci <- as.logical(as.character(pars["prob.ci",2]))
+prob.ci.alpha <- as.numeric(pars["prob.ci.alpha",2])
+prob.median <- as.logical(as.character(pars["prob.median",2]))
+committee.averaging <- as.logical(as.character(pars["committee.averaging",2]))
+prob.mean.weight <- as.logical(as.character(pars["prob.mean.weight",2]))
+prob.mean.weight.decay <- as.character(pars["prob.mean.weight.decay",2])
 
 # ---- Parameters for BIOMOD_Projection
 #
+proj.name <- eval(parse(text=as.character(pars["proj.name",2])))
+proj.binary.meth <- eval(parse(text=as.character(pars["proj.binary.meth",2])))
+
 
 # ---- Parameters for BIOMOD_EnsembleForecasting
 #
+ef.binary.meth <- eval(parse(text=as.character(pars["ef.binary.meth",2])))
+filtered.meth <- eval(parse(text=as.character(pars["filtered.meth",2])))
 
 # Unzip the covariates data
-unzip(zipfile = args[1], overwrite = TRUE)
+if(inherits(try(unzip(zipfile = args[1], overwrite = TRUE)),what = "try-error")){
+  stop("Unable to unzip the raster files!\n\n")
+}
 
 # List all GeoTIFF files to be used for 
 fl <- list.files(pattern=".tif$", full.names = TRUE)
@@ -118,7 +136,6 @@ cat("\n\n## ------------------------------------------------------------------ #
 myResp <- SpatialPoints(DataSpecies[,c("X","Y")], proj4string = crs(myExpl))
 print(myResp)
 cat("\n\n## ------------------------------------------------------------------ ##\n\n")
-
 
 
 ### ------------------------------------------------------------------------------ ###
@@ -231,18 +248,18 @@ write.csv(varImpObj, paste("./",resp.name,"/variableImportances.csv",sep=""))
 
 myBiomodEM <- try(BIOMOD_EnsembleModeling( 
   modeling.output = myBiomodModelOut, # model results
-  chosen.models = 'all', # models to be included when ensembling
-  em.by='all', # flag defining the way the models will be combined to build the ensemble models: 'PA_dataset+repet' (default), 'PA_dataset+algo', 'PA_dataset', 'algo', 'all'
-  eval.metric = c('ROC'), # evaluation metric used to build ensemble models
-  eval.metric.quality.threshold = c(0.7), # If not NULL, the minimum scores below which models will be excluded of the ensemble-models building
-  prob.mean = TRUE, # estimate the mean probabilities across predictions
-  prob.cv = FALSE, # estimate the coefficient of variation across predictions
-  prob.ci = FALSE, # estimate the confidence interval around the prob.mean
-  prob.ci.alpha = 0.05, # significance level for estimating the confidence interval. Default = 0.05
-  prob.median = FALSE, # estimate the mediane of probabilities
-  committee.averaging = FALSE, # estimate the committee averaging across predictions
-  prob.mean.weight = FALSE, # estimate the weighted sum of probabilities
-  prob.mean.weight.decay = 'proportional')) # define the relative importance of the weights
+  chosen.models = chosen.models, # models to be included when ensembling
+  em.by = em.by, # flag defining the way the models will be combined to build the ensemble models: 'PA_dataset+repet' (default), 'PA_dataset+algo', 'PA_dataset', 'algo', 'all'
+  eval.metric = eval.metric, # evaluation metric used to build ensemble models
+  eval.metric.quality.threshold = eval.metric.quality.threshold, # If not NULL, the minimum scores below which models will be excluded of the ensemble-models building
+  prob.mean = prob.mean, # estimate the mean probabilities across predictions
+  prob.cv = prob.cv, # estimate the coefficient of variation across predictions
+  prob.ci = prob.ci, # estimate the confidence interval around the prob.mean
+  prob.ci.alpha = prob.ci.alpha, # significance level for estimating the confidence interval. Default = 0.05
+  prob.median = prob.median, # estimate the mediane of probabilities
+  committee.averaging = committee.averaging, # estimate the committee averaging across predictions
+  prob.mean.weight = prob.mean.weight, # estimate the weighted sum of probabilities
+  prob.mean.weight.decay = prob.mean.weight.decay)) # define the relative importance of the weights
 
 
 if(inherits(myBiomodEM,"try-error"))
@@ -260,9 +277,9 @@ cat("\n\n## ------------------------------------------------------------------ #
 myBiomodProj <- try(BIOMOD_Projection(
   modeling.output = myBiomodModelOut, # modelling results
   new.env = myExpl, # environmental variables
-  proj.name = 'current', # name of projections
+  proj.name = proj.name, # name of projections
   selected.models = get_kept_models(myBiomodEM, model = 1), ## Changed this to include only selected models from BIOMOD_EnsembleModeling criteria
-  binary.meth = models.eval.meth, # a vector of a subset of models evaluation method computed before
+  binary.meth = proj.binary.meth, # a vector of a subset of models evaluation method computed before
   build.clamping.mask = TRUE, # if TRUE, a clamping mask will be saved on hard drive different
   output.format = '.grd', # the format of the GIS files
   do.stack = TRUE))
@@ -285,8 +302,8 @@ writeRaster(mod_projPres, filename = paste("./",resp.name,"/biomodProjectionsByM
 myBiomodEF <- try(BIOMOD_EnsembleForecasting( 
   EM.output = myBiomodEM,
   projection.output = myBiomodProj,
-  binary.meth = c('ROC', 'TSS'),
-  filtered.meth = c('ROC', 'TSS'),
+  binary.meth = ef.binary.meth,
+  filtered.meth = filtered.meth,
   compress = TRUE,
   output.format = '.grd'))
 
@@ -305,5 +322,5 @@ writeRaster(mod_projBiomodEF, filename = paste("./",resp.name,"/modelProjEnsembl
 ## This file should be exported from VLab
 zip("output.zip", paste("./", resp.name, sep=""))
 
-# Close log.txt file
+# Close log.txt file (to be exported by the VLab)
 sink()
