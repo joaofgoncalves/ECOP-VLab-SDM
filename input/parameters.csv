@@ -10,7 +10,7 @@ par,value
 resp.name,IrisBoissieri
 ##
 ## -- NUMBER OF PSEUDO ABSENCES -- ##
-PA.nb.absences,91
+PA.nb.absences,910
 ##
 ## -- NUMBER OF PA SETS -- ##
 PA.nb.rep,2
@@ -38,7 +38,7 @@ opts.MAXENT.Tsuruoka,NULL
 ## Full list is:
 ## models,"c('GLM','GBM','GAM','CTA','ANN','SRE','FDA','MARS','RF','MAXENT.Phillips','MAXENT.Tsuruoka')"
 ##
-models,"c('GLM','RF')"
+models,"c('GLM','RF','MAXENT.Phillips')"
 ##
 ## NUMBER EVALUATION RUNS -- ##
 NbRunEval,3
