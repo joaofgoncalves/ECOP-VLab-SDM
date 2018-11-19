@@ -23,7 +23,7 @@ IRIS SDM requires three generic inputs for running:
 
 3) a zip file named _vars.zip_ containing a set of GeoTIFF raster files used as predictor variables and therefore with a known linkage to the target species' distribution and habitat suitability. These data must have the same coordinate reference system of the input presence records.
 
-For more information on how to prepare the data and the parameter file, check the demo version data at [https://github.com/joaofgoncalves/ECOP-VL-SDM/input](https://github.com/joaofgoncalves/ECOP-VL-SDM/input)
+For more information on how to prepare the data and the parameter file, check the demo version data at this [link](https://github.com/joaofgoncalves/ECOP-VLab-SDM/tree/master/input).
 
 _EO data usage in the demo version_: MODIS derived Ecosystem Functional Attributes (EFA) calculated from time series of spectral vegetation indices (MOD13Q1, MOD09A1), land surface temperature (MOD11A1) and albedo (MCD43A1, MCD43B3).
 
